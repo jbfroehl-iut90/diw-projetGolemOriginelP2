@@ -1,0 +1,48 @@
+{% extends 'layouteu.html' %}
+
+{% block title %}
+<title>Nos marques de moto</title>
+{% endblock %}
+
+{% block body %}
+<h3>Nos marques de moto</h3>
+<br>
+<a href="/marque/add" class="btn btn-primary add">Ajouter une nouvelle marque</a>
+<br>
+<br><br>
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>id</th>
+            <th>marque</th>
+            <th>opération</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if brand | length >= 1 %}
+        {% for ligne in brand %}
+        <tr>
+            <td>{{ ligne.id }}</td>
+            <td>{{ ligne.libelle }}
+                <img src="{{ url_for('static', filename= 'images/' +ligne.logo) }}" alt=""
+                    style="max-width: 20px;">
+
+
+            </td>
+            <td>
+                <a href="/marque/edit?id={{ ligne.id }}" class="btn btn-primary">editer</a>&nbsp;
+                <a href="/marque/delete?id={{ ligne.id }}" class="btn btn-primary">supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td>
+                pas de type d'article
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

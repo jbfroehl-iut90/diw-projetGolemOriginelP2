@@ -1,0 +1,57 @@
+{% extends 'layouteu.html' %}
+
+{% block title %}
+<title>Filtres</title>
+{% endblock %}
+
+{% block body %}
+<div class="filtres">
+    <form method="get" action="/moto/filtre">
+        <fieldset>
+            <legend>Filtres</legend>
+            <fieldset>
+                <legend>Articles dont le nom est composé par : </legend>
+                <input type="text" name="filter_word" size="18" value="" id="filter_word" placeholder="Recherche">
+            </fieldset>
+            <fieldset>
+                <legend>Par marques</legend>
+                {% for values in brand %}
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.libelle
+                }}<br>
+                {% endfor %}
+            </fieldset>
+            <fieldset>
+                <legend>Par prix</legend>
+                <input type="number" name="filter_value_min" size="10" id="filter_value_min" placeholder="min">
+                <input type="number" name="filter_value_max" size="10" id="filter_value_max" placeholder="max">
+            </fieldset>
+            <input type="submit" name="submit" id="submit-button" value="Filtrer">
+        </fieldset>
+    </form>
+</div>
+<br>
+<h3>Motos</h3>
+<br><br>
+<div class="mes-cartes">
+
+    {% if moto | length >= 1 %}
+    {% for ligne in moto %}
+    <div class="card" style="width: 18rem;">
+        {% if ligne.photo != None %}
+        <img class="card-img-top" src="{{ url_for('static', filename= 'images/' + ligne.photo) }}" alt="Card image cap">
+        {% else %}
+        <img class="card-img-top"
+            src="https://ih1.redbubble.net/image.1945641357.3907/flat,750x,075,f-pad,750x1000,f8f8f8.jpg">
+        {%endif%}
+        <div class="card-body">
+            <h5 class="card-title">{{ ligne.nomMoto }}</h5>
+            <p class="card-text">Puissance : {{ ligne.puissance }} <br> Mise en Circulation : {{ ligne.DateMiseEnCirculation }} <br> Marque : {{ brand[ligne.marque_id-1]['libelle'] }} (id_marque : {{ ligne.marque_id}})</p>
+            <img src="{{ url_for('static', filename= 'images/' +brand[ligne.marque_id-1]['logo']) }}" alt="logo" style="max-width: 30px;">
+            <hr>
+            <p class="card-text">Couleur : <img src="{{ url_for('static', filename= 'images/' + ligne.couleur) }}.jpg" alt="couleur" style="width: 20px; height: 20px; border: 1px solid black;"></p>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

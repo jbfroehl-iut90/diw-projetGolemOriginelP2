@@ -1,0 +1,87 @@
+body {
+  font-family: 'Segoe UI';
+  padding: 10px;
+}
+
+nav {
+  text-align: center;
+}
+
+nav a:hover {
+  transform: scale(1.1);
+  transition: 0.5s;
+}
+
+
+h2 {
+  text-align: center;
+}
+
+body .add {
+  text-align: center;
+}
+
+fieldset {
+  border: 1px solid #bdbbbb;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+}
+
+#modifier {
+  margin-top: 5px;
+  padding: 3px;
+  border: #252525 1px solid;
+}
+
+#modifier:hover {
+  cursor: pointer;
+  background-color: #252525;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.flashes {
+  padding: 9px;
+  margin: 9px;
+}
+
+.alert-warning {
+  background-color: rgb(255, 0, 0);
+  color: black;
+}
+
+.alert-success {
+  background-color: #00ff00;
+  color: black;
+}
+
+.mes-cartes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  padding: 10px;
+  margin: 20px;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.card {
+  color: black;
+  background-color: whitesmoke;
+  border: 1px solid black;
+  box-shadow: 1px 1px 3px rgb(116, 116, 116);
+}
+
+.mes-cartes .btn {
+  margin: 2px;
+
+}
+
+.current {
+  background-color: rgb(2, 179, 2);
+  border: #252525;
+}

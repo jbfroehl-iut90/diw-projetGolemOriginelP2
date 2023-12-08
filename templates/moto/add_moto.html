@@ -1,0 +1,50 @@
+{% extends 'layouteu.html' %}
+
+{% block title %}
+<title>Ajouter une moto</title>
+{% endblock %}
+
+{% block body %}
+<h2>Ajout d'une nouvelle moto</h2>
+{% if error %}
+<p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+<form method="post" action="/moto/add">
+    <fieldset>
+        <legend>Nouvelle moto</legend>
+        <label for="nom">Nom</label><br>
+        <input id="nom" type="text" name="nom" value="" placeholder="Saisir le nom de la moto" required><br>
+        <label for="puissance">Puissance</label><br>
+        <input id="puissance" type="number" name="puissance" value="" placeholder="Saisir la puissance" required><br>
+        <label for="miseEnCirculation">Date de mise en circulation</label><br>
+        <input id="miseEnCirculation" type="date" name="miseEnCirculation" value="" placeholder="Saisir la date"><br>
+        <label for="photo">Image</label><br>
+        <input id="photo" type="text" name="photo" value="" placeholder="Saisir le nom de l'image"><br>
+        <label for="couleur">Couleur</label><br>
+        <select name="couleur" id="couleur">
+            <option value="">Saisir une valeur</option>
+            {% set couleurs = [] %}
+            {% for values in moto %}
+            {% if values.couleur not in couleurs %}
+            {% set couleurs = couleurs.append(values.couleur) %}
+            {% endif %}
+            {% endfor %}
+            {% for values in couleurs %}
+            <option value="{{ values }}">{{ values }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="marque_id">Marque</label><br>
+        <select name="marque_id" id="marque_id" required>
+            <option value="">Saisir une valeur</option>
+            {% for values in brand %}
+            <option value="{{ values.id }}">{{ values.libelle }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <br>
+        <input type="submit" value="Creer" name="Valider" id="modifier">
+        <br>
+    </fieldset>
+</form>
+{% endblock %}
