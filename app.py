@@ -24,24 +24,70 @@ def teardown_db(exception):
     if db is not None:
         db.close()
 
+
+
 @app.route('/')
 def show_layout():
     return render_template('layouteu.html')
 
 @app.route('/marque/show')
 def show_marque():
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques 
+    '''
+    mycursor.execute(sql)
+    marques= mycursor.fetchall()
+
     return render_template('brand/show_marque.html', brand = marques)
 
 @app.route('/marque/add', methods=['GET'])
 def add_marque():
-    return render_template('brand/add_marque.html')
+    mycursor = get_db().cursor()
+    sql='''
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques 
+    '''
+
+    mycursor.execute(sql)
+    marques= mycursor.fetchall()
+
+    sql='''
+    SELECT motos.id_moto AS id,
+    motos.nom_moto AS nom,
+    motos.puissance_moto AS puissance,
+    motos.couleur_moto AS couleur,
+    motos.miseEnCirculation_moto AS miseEnCirculation,
+    motos.photo_moto AS photo,
+    marques.libelle_marque AS marque
+    FROM motos INNER JOIN marques ON motos.marque_id_marque = marques.id_marque
+    '''
+
+    mycursor.execute(sql)
+    motos= mycursor.fetchall()
+
+    return render_template('brand/add_marque.html', brand=marques, moto=motos)
 
 @app.route('/marque/add', methods=['POST'])
 def valid_add_marque():
-    libelle = request.form.get('libelle', '')
-    logo = request.form.get('logo', '')
-    print(u'marque ajoutée , libellé : ', libelle, ' | logo : ', logo)
-    message = u'marque ajoutée, libellé : '+libelle+' | logo : '+logo
+    mycursor = get_db().cursor()
+
+    libelle = request.form['libelle']
+    logo = request.form['logo']
+    tuple_insert = (libelle, logo)
+    sql = '''
+    INSERT INTO marques (libelle_marque, logo_marque)
+    VALUES (%s, %s));
+    '''
+    mycursor.execute(sql, tuple_insert)
+    get_db().commit()
+    print(u'Nouvelle marque , libelle : ', libelle, ' | logo : ', logo)
+    message = u'Nouvelle marque , libelle : '+libelle + ' | logo : ' + logo
     flash(message, 'alert-success')
     return redirect('/marque/show')
 

@@ -1,13 +1,13 @@
 CREATE TABLE marques (
     id_marque INT NOT NULL AUTO_INCREMENT,
-    nom_marque VARCHAR(255) NOT NULL,
+    libelle_marque VARCHAR(255) NOT NULL,
     logo_marque VARCHAR(255) NOT NULL,
     PRIMARY KEY (id_marque)
 );
 
 CREATE TABLE motos (
     id_moto INT NOT NULL AUTO_INCREMENT,
-    nom_moto VARCHAR(255) NOT NULL,
+    libelle_moto VARCHAR(255) NOT NULL,
     puissance_moto INT NOT NULL,
     date_mise_en_circulation DATE NOT NULL,
     couleur_moto VARCHAR(255) NOT NULL,
