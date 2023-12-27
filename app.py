@@ -17,13 +17,11 @@ def get_db():
         )
     return g.db
 
-
 @app.teardown_appcontext
 def teardown_db(exception):
     db = g.pop('db', None)
     if db is not None:
         db.close()
-
 
 
 @app.route('/')
@@ -109,11 +107,11 @@ def edit_marque():
 
 @app.route('/marque/edit', methods=['POST'])
 def valid_edit_marque():
-    libelle = request.form['libelle']
     id = request.form.get('id', '')
+    libelle = request.form.get('libelle', '')
     logo = request.form.get('logo', '')
-    print(u'marque modifiée, id: ',id, " libelle :", libelle, " | logo :", logo)
-    message=u'une marque modifiée, id: ' + id + " libelle : " + libelle + " | logo : " + logo
+    print(u'marque modifiée , libelle : ', libelle, ' | logo : ', logo)
+    message = u'marque modifiée , libelle:'+libelle + ' | logo : ' + logo
     flash(message, 'alert-success')
     return redirect('/marque/show')
 
