@@ -11,25 +11,32 @@
   {% endif %}
   <form method="post" action="/moto/edit">
     <fieldset>
-        <legend> Modification de la moto {{ moto.nomMoto }} </legend>
+        <legend> Modification de la moto {{ moto.nom }} </legend>
         <input type="hidden" name="id" size="18" value="{{ moto.id }}" id="id">
         <label for="nom">Nom</label><br>
-        <input type="text" name="nom" size="18" value="{{ moto.nomMoto }}" id="nom"><br><br>
+        <input type="text" name="nom" size="18" value="{{ moto.nom }}" id="nom"><br><br>
         <label for="puissance">Puissance</label><br>
         <input type="number" name="puissance" value="{{ moto.puissance }}" id="puissance"><br><br>
         <label for="miseEnCirculation">Date de mise en circulation</label><br>
-        <input type="date" name="miseEnCirculation" value="{{ moto.DateMiseEnCirculation }}" id="miseEnCirculation"><br><br>
+        <input type="date" name="miseEnCirculation" value="{{ moto.miseEnCirculation }}" id="miseEnCirculation"><br><br>
         <label for="photo">Photo</label><br>
         <input type="text" name="photo" size="18" value="{{ moto.photo }}" id="photo">
         <img src="{{ url_for('static', filename= 'images/' + moto.photo) }}" alt="photoMoto" style="max-width: 70px;">
         <br>
         <label for="couleur">Couleur</label><br>
-        <input type="text" name="couleur" size="18" value="{{ moto.couleur }}" id="photo"><br><br>
+        <select name="couleur" id="couleur">
+          <option value="">{{ moto.couleur }}</option>
+          <hr>
+          {% for values in couleur %}
+          <option value="{{ values.couleur }}">{{ values.couleur }}</option>
+          {% endfor %}
+      </select>
+        <br><br>
         <label for="moto_id">Marque de la moto</label><br>
         <select name="marque_id" id="marque_id">
-            <option value="{{ moto.marque_id }}" class="current">{{ brand[moto.marque_id-1]['libelle'] }}</option>
+            <option value="{{ moto.id }}" class="current">{{ moto.marque }}</option>
             {% for values in brand %}
-            <option value="{{ values.id }}">{{ values.libelle }} </option>
+            <option value="{{ values.id }}">{{ values.nom }} </option>
             {%  endfor %}
         </select><br>
         <br>

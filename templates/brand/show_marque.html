@@ -15,7 +15,8 @@
     <thead class="thead-dark">
         <tr>
             <th>id</th>
-            <th>marque</th>
+            <th>Logo</th>
+            <th>Nom</th>
             <th>opération</th>
         </tr>
     </thead>
@@ -27,8 +28,9 @@
             <td>{{ ligne.libelle }}
                 <img src="{{ url_for('static', filename= 'images/' +ligne.logo) }}" alt=""
                     style="max-width: 20px;">
-
-
+            </td>
+            <td>
+                {{ ligne.nom }}
             </td>
             <td>
                 <a href="/marque/edit?id={{ ligne.id }}" class="btn btn-primary">editer</a>&nbsp;

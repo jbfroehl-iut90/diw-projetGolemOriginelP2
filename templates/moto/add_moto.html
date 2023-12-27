@@ -37,8 +37,9 @@
         <label for="marque_id">Marque</label><br>
         <select name="marque_id" id="marque_id" required>
             <option value="">Saisir une valeur</option>
+            <hr>
             {% for values in brand %}
-            <option value="{{ values.id }}">{{ values.libelle }}</option>
+            <option value="{{ values.id }}">{{ values.nom }}</option>
             {% endfor %}
         </select>
         <br>

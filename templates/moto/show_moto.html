@@ -34,11 +34,11 @@
           {% else %}
           <td><img src="https://ih1.redbubble.net/image.1945641357.3907/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"></td>
           {%endif%}
-          <td>{{ ligne.nomMoto }}</td>
+          <td>{{ ligne.nom }}</td>
           <td>{{ ligne.puissance }}</td>
-          <td>{{ ligne.DateMiseEnCirculation }}</td>
+          <td>{{ ligne.miseEnCirculation }}</td>
           <td><img src="{{ url_for('static', filename= 'images/' + ligne.couleur) }}.jpg" alt="couleur-moto" style="width: 30px; height: 30px; border: 1px solid black;"></td>
-          <td>{{ brand[ligne.marque_id-1]['libelle'] }} <img src="{{ url_for('static', filename= 'images/' +brand[ligne.marque_id-1]['logo']) }}" alt="logo" style="max-width: 20px;"></td>
+          <td>{{ ligne.marque }}  <img src="{{ url_for('static', filename= 'images/' + ligne.logo) }}" alt="" style="max-width: 20px;"></td>
           <td><a href="/moto/edit?id={{ ligne.id }}" class="btn btn-primary">editer</a></td>
           <td><a href="/moto/delete?id={{ ligne.id }}" class="btn btn-primary">supprimer</a></td>
         </tr>
