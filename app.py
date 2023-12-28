@@ -338,7 +338,6 @@ def edit_moto():
     return render_template('moto/edit_moto.html', moto=moto, brand=marques, couleur=couleurs)
 
 @app.route('/moto/edit', methods=['POST'])
-# Requête préparée avec SET PREPARE et EXECUTE pour valid_edit_moto
 def valid_edit_moto():
     mycursor = get_db().cursor()
     id_moto = request.form['id']
@@ -375,62 +374,6 @@ def valid_edit_moto():
     
     return redirect('/moto/show')
 
-
-
-@app.route('/moto/filtre2', methods=['GET'])
-def filtre_moto():
-    mycursor = get_db().cursor()
-    sql = '''
-    SELECT
-        motos.id_moto AS id,
-        motos.libelle_moto AS nom,
-        motos.puissance_moto AS puissance,
-        motos.couleur_moto AS couleur,
-        motos.date_mise_en_circulation AS miseEnCirculation,
-        motos.photo_moto AS photo,
-        marques.libelle_marque AS marque,
-        marques.logo_marque AS logo
-    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
-    '''
-    mycursor.execute(sql)
-    motos= mycursor.fetchall()
-
-    sql='''
-    SELECT marques.id_marque AS id,
-    marques.libelle_marque AS nom,
-    marques.logo_marque AS logo
-    FROM marques
-    '''
-    mycursor.execute(sql)
-    marques= mycursor.fetchall()
-
-    print("filtre")
-    filter_word= request.args.get('filter_word', None)
-    filter_value_min = request.args.get('filter_value_min', None)
-    filter_value_max = request.args.get('filter_value_max', None)
-    filter_items = request.args.getlist('filter_items', None)
-    if filter_word and filter_word != "":
-        message=u'filtre sur le mot  : '+filter_word
-        flash(message, 'alert-success')
-    if filter_value_min or filter_value_max :
-        if filter_value_min.isdecimal() and filter_value_max.isdecimal():
-            if int(filter_value_min) < int(filter_value_max):
-                message=u'filtre sur la colonne avec un numérique entre : '+filter_value_min+' et '+filter_value_max
-                flash(message, 'alert-success')
-            else :
-                message=u'min < max'
-                flash(message, 'alert-warning')
-        else :
-            message=u'min et max doivent être des numériques'
-            flash(message, 'alert-warning')
-    if filter_items and filter_items != []:
-        message=u'case à cocher selectionnée : '
-        for case in filter_items :
-            message+= 'id : '+case+' '
-        flash(message, 'alert-success')
-    return render_template('/moto/filtre_moto.html', moto=motos, brand=marques)
-
-# Même fonction que au dessus mais qui fonctionne et fait les filtrages correspondants avec les requêtes SQL
 @app.route('/moto/filtre', methods=['GET'])
 def filtre2_moto():
     mycursor = get_db().cursor()
@@ -458,7 +401,6 @@ def filtre2_moto():
     mycursor.execute(sql)
     marques= mycursor.fetchall()
 
-    print("filtre")
     filter_word= request.args.get('filter_word', None)
     filter_value_min = request.args.get('filter_value_min', None)
     filter_value_max = request.args.get('filter_value_max', None)
@@ -526,14 +468,12 @@ def filtre2_moto():
         tuple_filter = (', '.join(filter_items))
         mycursor.execute(sql, tuple_filter)
         motos= mycursor.fetchall()
+        print(motos)
         message=u'case à cocher selectionnée : '
         for case in filter_items :
             message+= 'id : '+case+' '
         flash(message, 'alert-success')
-    return render_template('/moto/filtre_moto.html', moto=motos, brand=marques)
-
-
-        
+    return render_template('/moto/filtre_moto.html', moto=motos, brand=marques, filter_word=filter_word, filter_value_min=filter_value_min, filter_value_max=filter_value_max, filter_items=filter_items)
 
 
 if __name__ == '__main__':

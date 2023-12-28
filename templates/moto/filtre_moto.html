@@ -11,20 +11,42 @@
             <legend>Filtres</legend>
             <fieldset>
                 <legend>Articles dont le nom est composé par : </legend>
+                {% if filter_word %}
+                <input type="text" name="filter_word" size="18" value="{{ filter_word }}" id="filter_word" placeholder="Recherche">
+                {% else %}
                 <input type="text" name="filter_word" size="18" value="" id="filter_word" placeholder="Recherche">
+                {% endif %}
             </fieldset>
+
             <fieldset>
                 <legend>Par marques</legend>
                 <!-- Coche les cases filtrées -->
-                
+                {% if filter_items %}
+                {% for values in brand %}
+                {% if values.id|string in filter_items %} 
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items" checked> {{ values.nom }}<br>
+                {% else %}
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.nom }}<br>
+                {% endif %}
+                {% endfor %}
+                {% else %}
                 {% for values in brand %}
                 <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.nom }}<br>
                 {% endfor %}
+                {% endif %}
             </fieldset>
             <fieldset>
-                <legend>Par prix</legend>
+                <legend>Par Puissance</legend>
+                {% if filter_value_min %}
+                <input type="number" name="filter_value_min" size="10" id="filter_value_min" value="{{ filter_value_min }}" placeholder="min">
+                {% else %}
                 <input type="number" name="filter_value_min" size="10" id="filter_value_min" placeholder="min">
+                {% endif %}
+                {% if filter_value_max %}
+                <input type="number" name="filter_value_max" size="10" id="filter_value_max" value="{{ filter_value_max }}" placeholder="max">
+                {% else %}
                 <input type="number" name="filter_value_max" size="10" id="filter_value_max" placeholder="max">
+                {% endif %}
             </fieldset>
             <input type="submit" name="submit" id="submit-button" value="Filtrer">
         </fieldset>
@@ -44,7 +66,7 @@
             src="https://ih1.redbubble.net/image.1945641357.3907/flat,750x,075,f-pad,750x1000,f8f8f8.jpg">
         {%endif%}
         <div class="card-body">
-            <h5 class="card-title">{{ ligne.nomMoto }}</h5>
+            <h5 class="card-title">{{ ligne.nom }}</h5>
             <p class="card-text">Puissance : {{ ligne.puissance }} <br> Mise en Circulation : {{ ligne.miseEnCirculation }} <br> Marque : {{ ligne.marque }}</p>
             <img src="{{ url_for('static', filename= 'images/' + ligne.logo) }}" alt="logo" style="max-width: 30px;">
             <hr>
