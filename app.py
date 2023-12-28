@@ -88,20 +88,79 @@ def valid_add_marque():
     flash(message, 'alert-success')
     return redirect('/marque/show')
 
+def check_if_empty_marque(id_marque):
+    mycursor = get_db().cursor()
+    tuple_check = (id_marque)
+    sql = '''
+    SELECT COUNT(*) AS nb
+    FROM motos
+    WHERE marque_id = %s
+    '''
+    mycursor.execute(sql, tuple_check)
+    nb = mycursor.fetchone()
+    return nb['nb']
+
+# Delete en cascade sur les motos mais vérifie si la marque est vide avant de supprimer (si ce n'est pas le cas, avertissement)
 @app.route('/marque/delete', methods=['GET'])
 def delete_marque():
     mycursor = get_db().cursor()
     id_marque = request.args.get('id', '')
+    if check_if_empty_marque(id_marque) == 0 :
+        tuple_delete = (id_marque)
+        sql = '''
+        DELETE FROM marques
+        WHERE id_marque = %s
+        '''
+        mycursor.execute(sql, tuple_delete)
+        get_db().commit()
+        message=u'Une marque supprimée ! id : ' + id_marque
+        flash(message, 'alert-warning')
+    else :
+        return redirect('/marque/delete/confirm?id='+id_marque)
+    return redirect('/marque/show')
+
+@app.route('/marque/delete/confirm', methods=['GET'])
+def delete_marque_confirm():
+    mycursor = get_db().cursor()
+    id_marque = request.args.get('id', '')
     tuple_delete = (id_marque)
     sql = '''
-    DELETE FROM marques
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques 
     WHERE id_marque = %s
     '''
     mycursor.execute(sql, tuple_delete)
-    get_db().commit()
-    message=u'Une marque supprimée ! id : ' + id_marque
-    flash(message, 'alert-warning')
-    return redirect('/ticket/show')
+    marque = mycursor.fetchone()
+
+    sql = '''
+    SELECT motos.id_moto AS id,
+    motos.libelle_moto AS nom,
+    motos.puissance_moto AS puissance,
+    motos.couleur_moto AS couleur,
+    motos.date_mise_en_circulation AS miseEnCirculation,
+    motos.photo_moto AS photo,
+    motos.marque_id AS marque_id
+    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+    WHERE marque_id = %s
+    '''
+    mycursor.execute(sql, tuple_delete)
+    motos = mycursor.fetchall()
+
+    # Nombres de motos dans la marque
+    sql = '''
+    SELECT COUNT(*) AS nb
+    FROM motos
+    WHERE marque_id = %s
+    '''
+    mycursor.execute(sql, tuple_delete)
+    nb = mycursor.fetchone()
+    
+    return render_template('brand/delete_marque.html', marque=marque, moto=motos, nb=nb['nb'])
+
+
+
 
 
 @app.route('/marque/edit', methods=['GET'])
@@ -222,7 +281,23 @@ def delete_moto():
     get_db().commit()
     message=u'Une moto supprimée ! id : ' + id_moto
     flash(message, 'alert-warning')
-    return redirect('/ticket/show')
+    return redirect('/moto/show')
+
+@app.route('/moto/delete/confirm', methods=['GET'])
+def delete_moto_confirm():
+    mycursor = get_db().cursor()
+    id_moto = request.args.get('id', '')
+    id_marque = request.args.get('id_marque', '')
+    tuple_delete = (id_moto)
+    sql = '''
+    DELETE FROM motos
+    WHERE id_moto = %s
+    '''
+    mycursor.execute(sql, tuple_delete)
+    get_db().commit()
+    message=u'Une moto supprimée ! id : ' + id_moto
+    flash(message, 'alert-warning')
+    return redirect('/marque/delete/confirm?id='+id_marque)
 
 @app.route('/moto/edit', methods=['GET'])
 def edit_moto():
@@ -276,19 +351,19 @@ def valid_edit_moto():
     tuple_edit = (libelle, int(id_moto), int(puissance), miseEnCirculation, couleur, photo, int(marque_id))
 
     sql = '''
-    SET @nouveau_nom = 'test';
-    SET @id_moto = '25';
-    SET @nouvelle_puissance = '3000';
-    SET @nouvelle_mise_en_circulation = '2023-12-06';
-    SET @nouvelle_couleur = 'bleu';
-    SET @nouvelle_photo = 'hdsgih';
-    SET @marque_id = 3;
+    SET @nouveau_nom = 'test'
+    SET @id_moto = '25'
+    SET @nouvelle_puissance = '3000'
+    SET @nouvelle_mise_en_circulation = '2023-12-06'
+    SET @nouvelle_couleur = 'bleu'
+    SET @nouvelle_photo = 'hdsgih'
+    SET @marque_id = 3
 
-    PREPARE stmt FROM 'UPDATE motos SET libelle_moto = ?, puissance_moto = ?, date_mise_en_circulation = ?, couleur_moto = ?, marque_id = ?, photo_moto = ? WHERE id_moto = ?';
+    PREPARE stmt FROM 'UPDATE motos SET libelle_moto = ?, puissance_moto = ?, date_mise_en_circulation = ?, couleur_moto = ?, marque_id = ?, photo_moto = ? WHERE id_moto = ?'
 
-    EXECUTE stmt USING @nouveau_nom, @nouvelle_puissance, @nouvelle_mise_en_circulation, @nouvelle_couleur, @marque_id, @nouvelle_photo, @id_moto;
+    EXECUTE stmt USING @nouveau_nom, @nouvelle_puissance, @nouvelle_mise_en_circulation, @nouvelle_couleur, @marque_id, @nouvelle_photo, @id_moto
 
-    DEALLOCATE PREPARE stmt;
+    DEALLOCATE PREPARE stmt
     '''
 
     mycursor.execute(sql)
@@ -302,8 +377,33 @@ def valid_edit_moto():
 
 
 
-@app.route('/moto/filtre', methods=['GET'])
+@app.route('/moto/filtre2', methods=['GET'])
 def filtre_moto():
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT
+        motos.id_moto AS id,
+        motos.libelle_moto AS nom,
+        motos.puissance_moto AS puissance,
+        motos.couleur_moto AS couleur,
+        motos.date_mise_en_circulation AS miseEnCirculation,
+        motos.photo_moto AS photo,
+        marques.libelle_marque AS marque,
+        marques.logo_marque AS logo
+    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+    '''
+    mycursor.execute(sql)
+    motos= mycursor.fetchall()
+
+    sql='''
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques
+    '''
+    mycursor.execute(sql)
+    marques= mycursor.fetchall()
+
     print("filtre")
     filter_word= request.args.get('filter_word', None)
     filter_value_min = request.args.get('filter_value_min', None)
@@ -329,6 +429,110 @@ def filtre_moto():
             message+= 'id : '+case+' '
         flash(message, 'alert-success')
     return render_template('/moto/filtre_moto.html', moto=motos, brand=marques)
+
+# Même fonction que au dessus mais qui fonctionne et fait les filtrages correspondants avec les requêtes SQL
+@app.route('/moto/filtre', methods=['GET'])
+def filtre2_moto():
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT
+        motos.id_moto AS id,
+        motos.libelle_moto AS nom,
+        motos.puissance_moto AS puissance,
+        motos.couleur_moto AS couleur,
+        motos.date_mise_en_circulation AS miseEnCirculation,
+        motos.photo_moto AS photo,
+        marques.libelle_marque AS marque,
+        marques.logo_marque AS logo
+    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+    '''
+    mycursor.execute(sql)
+    motos= mycursor.fetchall()
+
+    sql='''
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques
+    '''
+    mycursor.execute(sql)
+    marques= mycursor.fetchall()
+
+    print("filtre")
+    filter_word= request.args.get('filter_word', None)
+    filter_value_min = request.args.get('filter_value_min', None)
+    filter_value_max = request.args.get('filter_value_max', None)
+    filter_items = request.args.getlist('filter_items', None)
+    if filter_word and filter_word != "":
+        sql = '''
+        SELECT
+            motos.id_moto AS id,
+            motos.libelle_moto AS nom,
+            motos.puissance_moto AS puissance,
+            motos.couleur_moto AS couleur,
+            motos.date_mise_en_circulation AS miseEnCirculation,
+            motos.photo_moto AS photo,
+            marques.libelle_marque AS marque,
+            marques.logo_marque AS logo
+        FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+        WHERE libelle_moto LIKE %s
+        '''
+        tuple_filter = ('%'+filter_word+'%')
+        mycursor.execute(sql, tuple_filter)
+        motos= mycursor.fetchall()
+        message=u'filtre sur le mot  : '+filter_word
+        flash(message, 'alert-success')
+    if filter_value_min or filter_value_max :
+        if filter_value_min.isdecimal() and filter_value_max.isdecimal():
+            if int(filter_value_min) < int(filter_value_max):
+                sql = '''
+                SELECT
+                    motos.id_moto AS id,
+                    motos.libelle_moto AS nom,
+                    motos.puissance_moto AS puissance,
+                    motos.couleur_moto AS couleur,
+                    motos.date_mise_en_circulation AS miseEnCirculation,
+                    motos.photo_moto AS photo,
+                    marques.libelle_marque AS marque,
+                    marques.logo_marque AS logo
+                FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+                WHERE puissance_moto BETWEEN %s AND %s
+                '''
+                tuple_filter = (filter_value_min, filter_value_max)
+                mycursor.execute(sql, tuple_filter)
+                motos= mycursor.fetchall()
+                message=u'filtre sur la colonne avec un numérique entre : '+filter_value_min+' et '+filter_value_max
+                flash(message, 'alert-success')
+            else :
+                message=u'min < max'
+                flash(message, 'alert-warning')
+        else :
+            message=u'min et max doivent être des numériques'
+            flash(message, 'alert-warning')
+    if filter_items and filter_items != []:
+        sql = '''
+        SELECT
+            motos.id_moto AS id,
+            motos.libelle_moto AS nom,
+            motos.puissance_moto AS puissance,
+            motos.couleur_moto AS couleur,
+            motos.date_mise_en_circulation AS miseEnCirculation,
+            motos.photo_moto AS photo,
+            marques.libelle_marque AS marque,
+            marques.logo_marque AS logo
+        FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+        WHERE marque_id IN (%s)
+        '''
+        tuple_filter = (', '.join(filter_items))
+        mycursor.execute(sql, tuple_filter)
+        motos= mycursor.fetchall()
+        message=u'case à cocher selectionnée : '
+        for case in filter_items :
+            message+= 'id : '+case+' '
+        flash(message, 'alert-success')
+    return render_template('/moto/filtre_moto.html', moto=motos, brand=marques)
+
+
         
 
 

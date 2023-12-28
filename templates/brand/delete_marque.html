@@ -1,0 +1,55 @@
+{% extends 'layouteu.html' %}
+
+{% block title %}
+<title>Supprimer une marque</title>
+{% endblock %}
+
+{% block body %}
+<h2 style="color: red;">Suppression impossible, cette marque contient encore des produits</h2>
+{% if error %}
+<p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Marque : {{ marque.nom }} <img src="{{ url_for('static', filename= 'images/' +marque.logo) }}"
+                            alt="logo-marque" style="max-width: 70px;"> | Nombre de produits enregistrés : {{ nb }}</h3>
+                </div>
+                <div class="card-body">
+                    {% for elem in moto %}
+                    <!-- Tableau -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Nom</th>
+                                <th>Puissance</th>
+                                <th>Couleur</th>
+                                <th>Mise en Circulation</th>
+                                <th>Supprimer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><img src="{{ url_for('static', filename= 'images/' +elem.photo) }}" alt="logo"
+                                        style="max-width: 120px; border-radius: 10px;"></td>
+                                <td>{{ elem.nom }}</td>
+                                <td>{{ elem.puissance }}</td>
+                                <td>{{ elem.couleur }}</td>
+                                <td>{{ elem.miseEnCirculation }}</td>
+                                <td><a href="/moto/delete/confirm?id={{ elem.id }}&id_marque={{ elem.marque_id }}" class="btn btn-danger">Supprimer</a></td>
+                            </tr>
+                        </tbody>
+                        <br>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

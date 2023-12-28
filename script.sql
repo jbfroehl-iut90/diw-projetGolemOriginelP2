@@ -1,3 +1,5 @@
+DROP TABLES IF EXISTS motos, marques;
+
 CREATE TABLE marques (
     id_marque INT NOT NULL AUTO_INCREMENT,
     libelle_marque VARCHAR(255) NOT NULL,
@@ -14,7 +16,7 @@ CREATE TABLE motos (
     marque_id INT NOT NULL,
     photo_moto VARCHAR(255) NOT NULL,
     PRIMARY KEY (id_moto),
-    FOREIGN KEY (marque_id) REFERENCES marques(id_marque)
+    FOREIGN KEY (marque_id) REFERENCES marques(id_marque) ON DELETE CASCADE
 );
 
 INSERT INTO marques VALUES 

@@ -14,7 +14,7 @@
         <legend> Modifier une marque </legend>
         <input type="hidden" name="id" size="18" value="{{ marque.id }}" id="id">
         <label for="libelle">Libelle</label><br>
-        <input type="text" name="libelle" size="18" value="{{ marque.libelle }}" id="libelle"><br>
+        <input type="text" name="libelle" size="18" value="{{ marque.nom }}" id="libelle"><br>
         <label for="Logo">Logo</label><br>
         <input type="text" name="logo" size="18" value="{{ marque.logo }}" id="logo"> >> <img src="{{ url_for('static', filename= 'images/' +marque.logo) }}" alt="logo" style="max-width: 20px;"><br>
         <input type="submit" value="Modifier" name="Modifier" id="modifier" >

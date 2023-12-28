@@ -15,9 +15,10 @@
             </fieldset>
             <fieldset>
                 <legend>Par marques</legend>
+                <!-- Coche les cases filtrées -->
+                
                 {% for values in brand %}
-                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.libelle
-                }}<br>
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.nom }}<br>
                 {% endfor %}
             </fieldset>
             <fieldset>
@@ -33,7 +34,6 @@
 <h3>Motos</h3>
 <br><br>
 <div class="mes-cartes">
-
     {% if moto | length >= 1 %}
     {% for ligne in moto %}
     <div class="card" style="width: 18rem;">
@@ -45,8 +45,8 @@
         {%endif%}
         <div class="card-body">
             <h5 class="card-title">{{ ligne.nomMoto }}</h5>
-            <p class="card-text">Puissance : {{ ligne.puissance }} <br> Mise en Circulation : {{ ligne.DateMiseEnCirculation }} <br> Marque : {{ brand[ligne.marque_id-1]['libelle'] }} (id_marque : {{ ligne.marque_id}})</p>
-            <img src="{{ url_for('static', filename= 'images/' +brand[ligne.marque_id-1]['logo']) }}" alt="logo" style="max-width: 30px;">
+            <p class="card-text">Puissance : {{ ligne.puissance }} <br> Mise en Circulation : {{ ligne.miseEnCirculation }} <br> Marque : {{ ligne.marque }}</p>
+            <img src="{{ url_for('static', filename= 'images/' + ligne.logo) }}" alt="logo" style="max-width: 30px;">
             <hr>
             <p class="card-text">Couleur : <img src="{{ url_for('static', filename= 'images/' + ligne.couleur) }}.jpg" alt="couleur" style="width: 20px; height: 20px; border: 1px solid black;"></p>
         </div>
