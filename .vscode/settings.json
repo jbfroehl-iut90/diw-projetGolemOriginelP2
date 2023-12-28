@@ -1,0 +1,15 @@
+{
+    "background.styles": [
+        {},
+        {},
+        {}
+    ],
+    "background.fullscreen": {
+
+        "images": ["https://i.imgur.com/aTMLvyA.jpg"],
+        "opacity": 0.87,
+        "size": "cover",
+        "position": "center",
+        "interval": 0
+    }
+}

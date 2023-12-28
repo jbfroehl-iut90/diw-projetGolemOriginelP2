@@ -45,6 +45,11 @@
                         <br>
                         {% endfor %}
                     </table>
+                    <hr>
+                    <a href="/marque/show" class="btn btn-primary btn-center">Retour</a>
+                    <br>
+                    <h2 style="color: red;">Attention ! Cette operation n'est pas reversible et entrinera la suppression de toutes les motos de cette marque !</h2>
+                    <a href="/marque/delete/confirm/cascade?id={{ marque.id }}" class="btn btn-danger btn-center">Supprimer quand meme la marque</a>
                 </div>
             </div>
         </div>

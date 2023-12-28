@@ -10,7 +10,7 @@
         <fieldset>
             <legend>Filtres</legend>
             <fieldset>
-                <legend>Articles dont le nom est composé par : </legend>
+                <legend>Articles dont le nom est composé par :</legend>
                 {% if filter_word %}
                 <input type="text" name="filter_word" size="18" value="{{ filter_word }}" id="filter_word" placeholder="Recherche">
                 {% else %}
@@ -20,18 +20,17 @@
 
             <fieldset>
                 <legend>Par marques</legend>
-                <!-- Coche les cases filtrées -->
                 {% if filter_items %}
                 {% for values in brand %}
                 {% if values.id|string in filter_items %} 
-                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items" checked> {{ values.nom }}<br>
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items" checked>{{ values.nom }}<br>
                 {% else %}
-                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.nom }}<br>
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items">{{ values.nom }}<br>
                 {% endif %}
                 {% endfor %}
                 {% else %}
                 {% for values in brand %}
-                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items"> {{ values.nom }}<br>
+                <input type="checkbox" name="filter_items" value="{{ values.id }}" id="filter_items">{{ values.nom }}<br>
                 {% endfor %}
                 {% endif %}
             </fieldset>
@@ -56,21 +55,20 @@
 <h3>Motos</h3>
 <br><br>
 <div class="mes-cartes">
-    {% if moto | length >= 1 %}
+    {% if moto|length>=1 %}
     {% for ligne in moto %}
-    <div class="card" style="width: 18rem;">
-        {% if ligne.photo != None %}
-        <img class="card-img-top" src="{{ url_for('static', filename= 'images/' + ligne.photo) }}" alt="Card image cap">
+    <div class="card" style="width:18rem;">
+        {% if ligne.photo!=None %}
+        <img class="card-img-top" src="{{ url_for('static',filename='images/'+ligne.photo) }}" alt="{{ligne.nom}}Image">
         {% else %}
-        <img class="card-img-top"
-            src="https://ih1.redbubble.net/image.1945641357.3907/flat,750x,075,f-pad,750x1000,f8f8f8.jpg">
+        <img class="card-img-top" src="https://ih1.redbubble.net/image.1945641357.3907/flat,750x,075,f-pad,750x1000,f8f8f8.jpg" alt="DefaultImage">
         {%endif%}
         <div class="card-body">
-            <h5 class="card-title">{{ ligne.nom }}</h5>
-            <p class="card-text">Puissance : {{ ligne.puissance }} <br> Mise en Circulation : {{ ligne.miseEnCirculation }} <br> Marque : {{ ligne.marque }}</p>
-            <img src="{{ url_for('static', filename= 'images/' + ligne.logo) }}" alt="logo" style="max-width: 30px;">
+            <h5 class="card-title">{{ligne.nom}}</h5>
+            <p class="card-text">Puissance:{{ligne.puissance}}<br>Mise en Circulation:{{ligne.miseEnCirculation}}<br>Marque:{{ligne.marque}}</p>
+            <img src="{{url_for('static',filename='images/'+ligne.logo)}}" alt="{{ligne.marque}}Logo" style="max-width:30px;">
             <hr>
-            <p class="card-text">Couleur : <img src="{{ url_for('static', filename= 'images/' + ligne.couleur) }}.jpg" alt="couleur" style="width: 20px; height: 20px; border: 1px solid black;"></p>
+            <p class="card-text">Couleur:<img src="{{url_for('static',filename='images/'+ligne.couleur)}}.jpg" alt="{{ligne.couleur}}Color" style="width:20px;height:20px;border:1px solid black;"></p>
         </div>
     </div>
     {% endfor %}

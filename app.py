@@ -100,7 +100,6 @@ def check_if_empty_marque(id_marque):
     nb = mycursor.fetchone()
     return nb['nb']
 
-# Delete en cascade sur les motos mais vérifie si la marque est vide avant de supprimer (si ce n'est pas le cas, avertissement)
 @app.route('/marque/delete', methods=['GET'])
 def delete_marque():
     mycursor = get_db().cursor()
@@ -118,6 +117,8 @@ def delete_marque():
     else :
         return redirect('/marque/delete/confirm?id='+id_marque)
     return redirect('/marque/show')
+
+
 
 @app.route('/marque/delete/confirm', methods=['GET'])
 def delete_marque_confirm():
@@ -159,9 +160,20 @@ def delete_marque_confirm():
     
     return render_template('brand/delete_marque.html', marque=marque, moto=motos, nb=nb['nb'])
 
-
-
-
+@app.route('/marque/delete/confirm/cascade', methods=['GET'])
+def delete_marque_anyway():
+    mycursor = get_db().cursor()
+    id_marque = request.args.get('id', '')
+    tuple_delete = (id_marque)
+    sql = '''
+    DELETE FROM marques
+    WHERE id_marque = %s
+    '''
+    mycursor.execute(sql, tuple_delete)
+    get_db().commit()
+    message=u'Une marque supprimée ! id : ' + id_marque
+    flash(message, 'alert-warning')
+    return redirect('/marque/show')
 
 @app.route('/marque/edit', methods=['GET'])
 def edit_marque():
@@ -326,14 +338,12 @@ def edit_moto():
     mycursor.execute(sql)
     marques= mycursor.fetchall()
 
-    # Récupère les couleurs
     sql='''
     SELECT DISTINCT couleur_moto AS couleur
     FROM motos
     '''
     mycursor.execute(sql)
     couleurs= mycursor.fetchall()
-
 
     return render_template('moto/edit_moto.html', moto=moto, brand=marques, couleur=couleurs)
 
@@ -462,17 +472,18 @@ def filtre2_moto():
             motos.photo_moto AS photo,
             marques.libelle_marque AS marque,
             marques.logo_marque AS logo
-        FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
-        WHERE marque_id IN (%s)
-        '''
-        tuple_filter = (', '.join(filter_items))
-        mycursor.execute(sql, tuple_filter)
-        motos= mycursor.fetchall()
+        FROM motos
+        INNER JOIN marques ON motos.marque_id = marques.id_marque
+        WHERE marque_id IN ({})
+        '''.format(', '.join(['%s'] * len(filter_items)))
+        mycursor.execute(sql, filter_items)
+        motos = mycursor.fetchall()
         print(motos)
-        message=u'case à cocher selectionnée : '
-        for case in filter_items :
-            message+= 'id : '+case+' '
+        message = 'case à cocher selectionnée : '
+        for case in filter_items:
+            message += 'id : ' + case + ' '
         flash(message, 'alert-success')
+
     return render_template('/moto/filtre_moto.html', moto=motos, brand=marques, filter_word=filter_word, filter_value_min=filter_value_min, filter_value_max=filter_value_max, filter_items=filter_items)
 
 
