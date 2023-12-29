@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, abort, flash, g
+from flask import Flask, request, render_template, redirect, abort, flash, g, session
 
 import pymysql.cursors
 
@@ -223,7 +223,7 @@ def show_moto():
         motos.photo_moto AS photo,
         marques.libelle_marque AS marque,
         marques.logo_marque AS logo
-    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+    FROM motos LEFT JOIN marques ON motos.marque_id = marques.id_marque
     '''
     mycursor.execute(sql)
     motos= mycursor.fetchall()
@@ -370,8 +370,9 @@ def valid_edit_moto():
     flash(message, 'alert-success')
     return redirect('/moto/show')
 
+# Mon filtre de base
 @app.route('/moto/filtre', methods=['GET'])
-def filtre2_moto():
+def filtre_moto():
     mycursor = get_db().cursor()
     sql = '''
     SELECT
@@ -419,7 +420,7 @@ def filtre2_moto():
         mycursor.execute(sql, tuple_filter)
         motos= mycursor.fetchall()
         message=u'filtre sur le mot  : '+filter_word
-        flash(message, 'alert-success')
+        # flash(message, 'alert-success')
     if filter_value_min or filter_value_max :
         if filter_value_min.isdecimal() and filter_value_max.isdecimal():
             if int(filter_value_min) < int(filter_value_max):
@@ -440,7 +441,7 @@ def filtre2_moto():
                 mycursor.execute(sql, tuple_filter)
                 motos= mycursor.fetchall()
                 message=u'filtre sur la colonne avec un numérique entre : '+filter_value_min+' et '+filter_value_max
-                flash(message, 'alert-success')
+                # flash(message, 'alert-success')
             else :
                 message=u'min < max'
                 flash(message, 'alert-warning')
@@ -468,9 +469,128 @@ def filtre2_moto():
         message = 'case à cocher selectionnée : '
         for case in filter_items:
             message += 'id : ' + case + ' '
-        flash(message, 'alert-success')
+        # flash(message, 'alert-success')
 
     return render_template('/moto/filtre_moto.html', moto=motos, brand=marques, filter_word=filter_word, filter_value_min=filter_value_min, filter_value_max=filter_value_max, filter_items=filter_items)
+
+
+# Filtre avec les cookies de session que je n'arrive pas encore à faire fonctionner
+@app.route('/moto/filtre2', methods=['GET'])
+def filtre_moto_session():
+    mycursor = get_db().cursor()
+
+    # Récupérer les valeurs des filtres depuis la session
+    filter_word = session.get('filter_word', None)
+    filter_value_min = session.get('filter_value_min', None)
+    filter_value_max = session.get('filter_value_max', None)
+    filter_items = session.get('filter_items', [])
+
+    # Appliquer les filtres
+    motos = apply_filters(mycursor, filter_word, filter_value_min, filter_value_max, filter_items)
+
+    # Récupérer les marques
+    sql='''
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques
+    '''
+    mycursor.execute(sql)
+    marques= mycursor.fetchall()
+
+    return render_template('/moto/filtre_moto.html', moto=motos, brand=marques,filter_word=filter_word, filter_value_min=filter_value_min, filter_value_max=filter_value_max, filter_items=filter_items)
+
+def apply_filters(mycursor, filter_word=None, filter_value_min=None, filter_value_max=None, filter_items=None):
+    # Initialisation des variables SQL et des paramètres
+    sql = '''
+    SELECT
+        motos.id_moto AS id,
+        motos.libelle_moto AS nom,
+        motos.puissance_moto AS puissance,
+        motos.couleur_moto AS couleur,
+        motos.date_mise_en_circulation AS miseEnCirculation,
+        motos.photo_moto AS photo,
+        marques.libelle_marque AS marque,
+        marques.logo_marque AS logo
+    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+    '''
+    list_param = []
+
+    # Conditions basées sur les filtres
+    if filter_word:
+        sql += " WHERE nom LIKE %s "
+        recherche = "%" + filter_word + "%"
+        list_param.append(recherche)
+
+    if filter_value_min or filter_value_max:
+        if filter_word:
+            sql += " AND "
+        else:
+            sql += " WHERE "
+        sql += "puissance_moto BETWEEN %s AND %s "
+        list_param.append(filter_value_min or 0)
+        list_param.append(filter_value_max or float('inf'))
+
+    if filter_items:
+        if filter_word or filter_value_min or filter_value_max:
+            sql += " AND ("
+        else:
+            sql += " WHERE ("
+
+        last_item = filter_items[-1]
+        for item in filter_items:
+            sql += " marque_id = %s "
+            if item != last_item:
+                sql += " or "
+            list_param.append(item)
+        sql += ")"
+
+    # Exécution de la requête
+    mycursor.execute(sql, tuple(list_param))
+    motos = mycursor.fetchall()
+
+    return motos
+
+@app.route('/moto/filtre2', methods=['POST'])
+def valid_moto_filtre_session():
+    filter_word = request.form.get('filter_word', None)
+    filter_prix_min = request.form.get('filter_prix_min', None)
+    filter_prix_max = request.form.get('filter_prix_max', None)
+    filter_types = request.form.getlist('filter_types', None)
+    print("word:" + filter_word + str(len(filter_word)))
+    if filter_word or filter_word == "":
+        if len(filter_word) > 1:
+            if filter_word.isalpha():
+                session['filter_word'] = filter_word
+            else:
+                flash(u'votre Mot recherché doit uniquement être composé de lettres')
+        else:
+            if len(filter_word) == 1:
+                flash(u'votre Mot recherché doit être composé de au moins 2 lettres')
+            else:
+                session.pop('filter_word', None)
+    if filter_prix_min or filter_prix_max:
+        if filter_prix_min.isdecimal() and filter_prix_max.isdecimal():
+            if int(filter_prix_min) < int(filter_prix_max):
+                session['filter_prix_min'] = filter_prix_min
+                session['filter_prix_max'] = filter_prix_max
+            else:
+                flash(u'min < max')
+        else:
+            flash(u'min et max doivent être des numériques')
+    if filter_types and filter_types != []:
+        session['filter_types'] = filter_types
+    return redirect('/moto/filtre2')
+
+
+
+@app.route('/moto/filtre/suppr', methods=['POST'])
+def filtre_moto_suppr():
+    session.pop('filter_word', None)
+    session.pop('filter_value_min', None)
+    session.pop('filter_value_max', None)
+    session.pop('filter_items', None)
+    return redirect('/moto/filtre')
 
 
 @app.route('/moto/etat', methods=['GET'])
