@@ -21,7 +21,7 @@
         <input type="date" name="miseEnCirculation" value="{{ moto.miseEnCirculation }}" id="miseEnCirculation"><br><br>
         <label for="photo">Photo</label><br>
         <input type="text" name="photo" size="18" value="{{ moto.photo }}" id="photo">
-        <img src="{{ url_for('static', filename= 'images/' + moto.photo) }}" alt="photoMoto" style="max-width: 70px;">
+        <img src="{{ url_for('static', filename= 'images/' + moto.photo) }}" alt="photo" style="max-width: 70px;">
         <br>
         <label for="couleur">Couleur</label><br>
         <select name="couleur" id="couleur">

@@ -628,7 +628,7 @@ def etat_moto():
     mycursor.execute(sql)
     nb_motos_marque = mycursor.fetchall()
     
-    return render_template('/etat.html', moto=motos, brand=marques, nb_motos_marque=nb_motos_marque, nb_motos_couleur=nb_motos_couleur, nb=nb)
+    return render_template('/etat.html', moto=motos, brand=marques, nb_motos_marque=nb_motos_marque)
 
 
 if __name__ == '__main__':

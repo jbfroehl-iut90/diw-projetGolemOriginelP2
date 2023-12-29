@@ -34,14 +34,14 @@
             </td>
             <td>
                 <a href="/marque/edit?id={{ ligne.id }}" class="btn btn-primary">editer</a>&nbsp;
-                <a href="/marque/delete?id={{ ligne.id }}" class="btn btn-primary">supprimer</a>
+                <a href="/marque/delete?id={{ ligne.id }}" class="btn btn-primary" style="background-color: red; border: none;">supprimer</a>
             </td>
         </tr>
         {% endfor %}
         {% else %}
         <tr>
             <td>
-                pas de type d'article
+                Pas de marques...
             </td>
         </tr>
         {% endif %}

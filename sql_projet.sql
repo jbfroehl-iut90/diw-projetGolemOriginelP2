@@ -16,8 +16,18 @@ CREATE TABLE motos (
     marque_id INT NOT NULL,
     photo_moto VARCHAR(255) NOT NULL,
     PRIMARY KEY (id_moto),
+    CONSTRAINT fk_marque_id
     FOREIGN KEY (marque_id) REFERENCES marques(id_marque) ON DELETE CASCADE
 );
+
+-- Suppression de la contrainte d'intégrité référentielle
+ALTER TABLE motos
+DROP FOREIGN KEY fk_marque_id;
+
+-- Et on la remet
+ALTER TABLE motos
+ADD CONSTRAINT fk_marque_id
+FOREIGN KEY (marque_id) REFERENCES marques(id_marque) ON DELETE CASCADE;
 
 INSERT INTO marques VALUES 
     (NULL, 'Yamaha', 'logo-yamaha.jpg'),
@@ -65,11 +75,11 @@ SET @nouvelle_photo = 'ninja400.jpg';
 SET @id_moto = '9';
 SET @nouvelle_puissance = '3000';
 SET @nouvelle_mise_en_circulation = '2023-12-06';
-SET @nouvelle_couleur = 'bleu';
+SET @nouvelle_couleur = 'blue';
 SET @marque_id = 1;
 
-PREPARE stmt FROM 'UPDATE motos SET libelle_moto = ?, puissance_moto = ?, date_mise_en_circulation = ?, couleur_moto = ?, marque_id = ?, photo_moto = ? WHERE id_moto = ?'
+PREPARE stmt FROM 'UPDATE motos SET libelle_moto = ?, puissance_moto = ?, date_mise_en_circulation = ?, couleur_moto = ?, marque_id = ?, photo_moto = ? WHERE id_moto = ?';
 
-EXECUTE stmt USING @nouveau_nom, @nouvelle_puissance, @nouvelle_mise_en_circulation, @nouvelle_couleur, @marque_id, @nouvelle_photo, @id_moto
+EXECUTE stmt USING @nouveau_nom, @nouvelle_puissance, @nouvelle_mise_en_circulation, @nouvelle_couleur, @marque_id, @nouvelle_photo, @id_moto;
 
-DEALLOCATE PREPARE stmt
+DEALLOCATE PREPARE stmt;
