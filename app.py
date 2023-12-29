@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, abort, flash, session, g
+from flask import Flask, request, render_template, redirect, abort, flash, g
 
 import pymysql.cursors
 
@@ -357,31 +357,17 @@ def valid_edit_moto():
     miseEnCirculation = request.form['miseEnCirculation']
     couleur = request.form['couleur']
     photo = request.form['photo']
-    tuple_edit = (libelle, int(id_moto), int(puissance), miseEnCirculation, couleur, photo, int(marque_id))
-
+    tuple_edit = (libelle, marque_id, puissance, miseEnCirculation, couleur, photo, id_moto)
     sql = '''
-    SET @nouveau_nom = 'test'
-    SET @id_moto = '25'
-    SET @nouvelle_puissance = '3000'
-    SET @nouvelle_mise_en_circulation = '2023-12-06'
-    SET @nouvelle_couleur = 'bleu'
-    SET @nouvelle_photo = 'hdsgih'
-    SET @marque_id = 3
-
-    PREPARE stmt FROM 'UPDATE motos SET libelle_moto = ?, puissance_moto = ?, date_mise_en_circulation = ?, couleur_moto = ?, marque_id = ?, photo_moto = ? WHERE id_moto = ?'
-
-    EXECUTE stmt USING @nouveau_nom, @nouvelle_puissance, @nouvelle_mise_en_circulation, @nouvelle_couleur, @marque_id, @nouvelle_photo, @id_moto
-
-    DEALLOCATE PREPARE stmt
+    UPDATE motos
+    SET libelle_moto = %s, marque_id = %s, puissance_moto = %s, date_mise_en_circulation = %s, couleur_moto = %s, photo_moto = %s
+    WHERE id_moto = %s
     '''
-
-    mycursor.execute(sql)
+    mycursor.execute(sql, tuple_edit)
     get_db().commit()
-
-    message = f"Moto modifiée - Libelle: {libelle}, Marque_id: {marque_id}, Puissance: {puissance}, Mise en circulation: {miseEnCirculation}, Couleur: {couleur}, Photo: {photo}"
-    
+    print(u'moto modifiée , libelle : ', libelle, ' | marque_id : ', marque_id, ' | puissance : ', puissance, ' | mise en circulation : ', miseEnCirculation, ' | couleur : ', couleur, ' | photo : ', photo)
+    message = u'moto modifiée , libelle : '+libelle + ' | marque_id : ' + marque_id + ' | puissance : ' + puissance + ' | mise en circulation : ' + miseEnCirculation + ' | couleur : ' + couleur + ' | photo : ' + photo
     flash(message, 'alert-success')
-    
     return redirect('/moto/show')
 
 @app.route('/moto/filtre', methods=['GET'])
@@ -487,7 +473,45 @@ def filtre2_moto():
     return render_template('/moto/filtre_moto.html', moto=motos, brand=marques, filter_word=filter_word, filter_value_min=filter_value_min, filter_value_max=filter_value_max, filter_items=filter_items)
 
 
+@app.route('/moto/etat', methods=['GET'])
+def etat_moto():
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT
+        motos.id_moto AS id,
+        motos.libelle_moto AS nom,
+        motos.puissance_moto AS puissance,
+        motos.couleur_moto AS couleur,
+        motos.date_mise_en_circulation AS miseEnCirculation,
+        motos.photo_moto AS photo,
+        marques.libelle_marque AS marque,
+        marques.logo_marque AS logo
+    FROM motos INNER JOIN marques ON motos.marque_id = marques.id_marque
+    '''
+    mycursor.execute(sql)
+    motos= mycursor.fetchall()
+
+    sql='''
+    SELECT marques.id_marque AS id,
+    marques.libelle_marque AS nom,
+    marques.logo_marque AS logo
+    FROM marques
+    '''
+    mycursor.execute(sql)
+    marques= mycursor.fetchall()
+
+    sql = '''
+    SELECT COUNT(*) AS nb, marque_id
+    FROM motos
+    GROUP BY marque_id
+    '''
+    mycursor.execute(sql)
+    nb_motos_marque = mycursor.fetchall()
+    
+    return render_template('/etat.html', moto=motos, brand=marques, nb_motos_marque=nb_motos_marque, nb_motos_couleur=nb_motos_couleur, nb=nb)
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run() 
 
 

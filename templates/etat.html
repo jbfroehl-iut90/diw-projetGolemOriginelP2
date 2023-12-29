@@ -1,0 +1,57 @@
+{% extends 'layouteu.html' %}
+
+{% block title %}
+<title>Etat Shop Motos</title>
+{% endblock %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Statistiques du site</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nombre de motos par marque</th>
+                                <th>Marques enregistrées</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {% for marque in brand %}
+                                    {% for nb in nb_motos_marque %}
+                                    {% if marque.id == nb.marque_id %}
+                                    {{ marque.nom }} : {{ nb.nb }} motos<br>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
+                                    <hr>
+                                    <strong>Pour un total de <span style="color: red;">{{ moto|length }}</span> motos enregistrées sur 
+                                        <span style="color: green;">{{ nb_motos_marque|length }}</span> marques différentes</strong>
+                                </td>
+                                <td>
+                                    {% for marque in brand %}
+                                    {{ marque.nom }}<br>
+                                    {% endfor %}
+                                    <hr>
+                                    <strong>Pour un total de <span style="color: green;">{{ brand|length }}</span> marques enregistrées</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <a href="/moto/show" class="btn btn-primary btn-center">Retour</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

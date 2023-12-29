@@ -57,3 +57,19 @@ INSERT INTO motos VALUES
     (NULL, 'R 1200 RT', 1200, '2013-08-27', 'blue', 4, 'r1200rt.jpg'),
     (NULL, 'R 900 RT', 900, '2014-08-27', 'blue', 4, 'r900rt.jpg'),
     (NULL, 'S 1000 SR', 1000, '2015-08-27', 'blue', 4, 's1000sr.jpeg');
+
+
+-- Exemple de requête préparée pour modifier une moto (celle avec l'id 9) :
+SET @nouveau_nom = 'Yamaha YZF R6';
+SET @nouvelle_photo = 'ninja400.jpg';
+SET @id_moto = '9';
+SET @nouvelle_puissance = '3000';
+SET @nouvelle_mise_en_circulation = '2023-12-06';
+SET @nouvelle_couleur = 'bleu';
+SET @marque_id = 1;
+
+PREPARE stmt FROM 'UPDATE motos SET libelle_moto = ?, puissance_moto = ?, date_mise_en_circulation = ?, couleur_moto = ?, marque_id = ?, photo_moto = ? WHERE id_moto = ?'
+
+EXECUTE stmt USING @nouveau_nom, @nouvelle_puissance, @nouvelle_mise_en_circulation, @nouvelle_couleur, @marque_id, @nouvelle_photo, @id_moto
+
+DEALLOCATE PREPARE stmt
